@@ -1,18 +1,21 @@
-package org.main;
+package org.main.receive;
+
+import org.main.PacketAnalyzer;
+import org.main.receive.Receiver;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 import static java.lang.Thread.sleep;
 
-public class ReceiverThread implements Runnable {
+public class ReceiverThread{
     private Timer timer;
     private Receiver receiver;
     private PacketAnalyzer packetAnalyzer;
-    public ReceiverThread(Receiver r, PacketAnalyzer pa){
+    public ReceiverThread(Receiver receiver, PacketAnalyzer packetAnalyzer){
         timer = new Timer();
-        receiver = r;
-        packetAnalyzer = pa;
+        this.receiver = receiver;
+        this.packetAnalyzer = packetAnalyzer;
     }
 
     public void run(){

@@ -1,10 +1,12 @@
-package org.main;
+package org.main.receive;
+
+import org.main.PacketAnalyzer;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.util.Vector;
+
 
 public class Receiver {
     public MulticastSocket receiverSocket;
@@ -17,7 +19,7 @@ public class Receiver {
             throw new RuntimeException(e);
         }
     }
-    public void receive(PacketAnalyzer pa){
+    public void receive(PacketAnalyzer packetAnalyzer){
         var receivedMulticastDatagram = new DatagramPacket(new byte[400], 400);
         try {
             receiverSocket.receive(receivedMulticastDatagram);
@@ -25,8 +27,7 @@ public class Receiver {
             throw new RuntimeException(e);
         }
         String str = getStringFromData(receivedMulticastDatagram);
-        pa.stringАnalisis(str);
-        System.out.println(str);
+        packetAnalyzer.stringАnalysis(str);
     }
     public void finishReceiving(){
         try {
@@ -38,23 +39,13 @@ public class Receiver {
     }
 
     String getStringFromData(DatagramPacket packet){
-        Vector<Integer> lengthArray = new Vector<>();
-        int i = 0;
-        while (packet.getData()[i]< 58 && packet.getData()[i] > 47){
-            lengthArray.add((int) packet.getData()[i] );
-            i++;
-        }
-        int strLength = 0;
-        for (int j = 0; j < lengthArray.size(); j++){
-            int decMul = 1;
-            for (int k = 0; k < lengthArray.size() - j - 1; k++){
-                decMul *= 10;
-            }
-            strLength += (lengthArray.get(j)-48) * decMul;
-        }
-
-        byte[] byteString = new byte[strLength];
-        System.arraycopy(packet.getData(), i, byteString, 0, strLength);
+        final int maxLength = 3;
+        byte[] byteStringLength = new byte[maxLength];
+        System.arraycopy(packet.getData(), 0, byteStringLength, 0, maxLength);
+        String lengthString = new String(byteStringLength);
+        int length = Integer.parseInt(lengthString.split(" ")[0]);
+        byte[] byteString = new byte[length];
+        System.arraycopy(packet.getData(), maxLength, byteString, 0, length);
         return new String(byteString);
     }
 

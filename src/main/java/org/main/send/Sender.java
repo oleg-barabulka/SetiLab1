@@ -1,4 +1,4 @@
-package org.main;
+package org.main.send;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -17,15 +17,15 @@ public class Sender {
         }
     }
     public void sendDatagram(String content)  {
-        String contentLength = String.valueOf(content.length());
+        final int MAX_LENGTH = 3;
+        StringBuilder contentLength = new StringBuilder(String.valueOf(content.length()));
+        while (contentLength.length() < MAX_LENGTH){
+            contentLength.append(" ");
+        }
         content = contentLength + content;
         DatagramPacket datagram;
         try {
             datagram = new DatagramPacket(content.getBytes(), content.getBytes().length, InetAddress.getByName("224.1.1.1"), 8000);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
-        }
-        try {
             senderSocket.send(datagram);
         } catch (IOException e) {
             throw new RuntimeException(e);
